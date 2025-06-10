@@ -1,0 +1,66 @@
+<!-- TabWrapper.svelte -->
+<script>
+  import { setContext, getContext } from "svelte";
+  import { writable } from "svelte/store"; // For shared activeTabId state
+
+  // --- Props ---
+  // Optional custom class for the main wrapper div
+  /** @type {string} */
+  export let wrapperClass = "";
+
+  // --- Internal State ---
+  // A writable store to hold the ID of the currently active tab.
+  // This is shared with child Tab components via context.
+  const activeTabIdStore = writable(null);
+
+  // An array to keep track of all registered tab IDs.
+  // This is used by Tab components to register themselves.
+  const registeredTabs = writable([]);
+
+  // --- Context Setup for Children ---
+  // Set context for child Tab components to register and interact.
+  setContext("tabs_context", {
+    // Allows a Tab component to register its ID and title
+    registerTab: (id, title) => {
+      registeredTabs.update((tabs) => {
+        if (!tabs.some((t) => t.id === id)) {
+          // Prevent duplicate registration
+          return [...tabs, { id, title }];
+        }
+        return tabs;
+      });
+      // Automatically activate the first registered tab if none is active
+      activeTabIdStore.update((currentId) => {
+        if (currentId === null) {
+          return id;
+        }
+        return currentId;
+      });
+    },
+    // Provides the active tab ID store so children can subscribe
+    activeTabId: activeTabIdStore,
+  });
+</script>
+
+<div class="tab-wrapper {wrapperClass}">
+  <div class="tab-headers">
+    {#each $registeredTabs as tab (tab.id)}
+      <button onclick={() => activeTabIdStore.set(tab.id)}>
+        {tab.title}
+      </button>
+    {/each}
+  </div>
+
+  <div class="tab-content border border-gray-200 p-4 rounded-lg bg-white">
+    <slot {activeTabIdStore}></slot>
+  </div>
+</div>
+
+<style>
+  .tab-wrapper {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+  }
+</style>

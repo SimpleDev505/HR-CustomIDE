@@ -1,0 +1,131 @@
+<script lang="ts">
+  import { projectStore, type ProjectMetadata } from "$lib/store";
+  import { invoke } from "@tauri-apps/api/core";
+  let dropdown_file = $state(false);
+  let dropdown_edit = $state(false);
+  let dropdown_settings = $state(false);
+  let dropdown_run = $state(false);
+  function clickOption(name: string) {
+    switch (name) {
+      case "file":
+        dropdown_file = true;
+        //
+        dropdown_edit = false;
+        dropdown_settings = false;
+        dropdown_run = false;
+
+        break;
+      case "edit":
+        dropdown_edit = true;
+        //
+        dropdown_file = false;
+        dropdown_settings = false;
+        dropdown_run = false;
+        break;
+      case "settings":
+        dropdown_settings = true;
+        //
+        dropdown_file = false;
+        dropdown_edit = false;
+        dropdown_run = false;
+        break;
+      case "run":
+        dropdown_run = true;
+        //
+        dropdown_file = false;
+        dropdown_settings = false;
+        dropdown_edit = false;
+        break;
+    }
+  }
+  //File
+  async function createProject() {
+    const result = await invoke<ProjectMetadata>("create_project", {});
+    projectStore.set(result);
+  }
+</script>
+
+<div class="menu-cnt">
+  <div class="menu-tools">
+    <span>HR</span>
+    <ul class="menu-nav">
+      <li>
+        <button
+          onclick={() => {
+            clickOption("file");
+          }}>File</button
+        >
+      </li>
+      <li>
+        <button
+          onclick={() => {
+            clickOption("file");
+          }}>Edit</button
+        >
+      </li>
+      <li>
+        <button
+          onclick={() => {
+            clickOption("file");
+          }}>Settings</button
+        >
+      </li>
+      <li>Run</li>
+    </ul>
+  </div>
+</div>
+
+<style>
+  .menu-cnt {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    grid-column: 1/3;
+    grid-row: 1;
+    width: 100%;
+    height: 2.5em;
+    padding: 0;
+    margin: 0;
+    padding-left: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    font-size: var(--font-sm);
+    cursor: default;
+  }
+  .menu-tools {
+    display: flex;
+    flex-direction: row;
+    width: fit-content;
+    height: 10px;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  .menu-tools span {
+    margin-right: 15px;
+    font-weight: bold;
+    padding: 4px;
+    background-color: var(--blue-bg);
+    border-radius: 5px;
+  }
+  .menu-nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    column-gap: 15px;
+    height: 10px;
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+    text-decoration: none;
+  }
+  .menu-nav li {
+    padding: 4px;
+    border-radius: 5px;
+    transition: 0.25s;
+  }
+  .menu-nav li:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    /* outline: 1px solid white; */
+  }
+</style>

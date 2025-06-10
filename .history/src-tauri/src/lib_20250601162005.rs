@@ -1,0 +1,23 @@
+// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
+use serde::{Deserialize, Serialize};
+use std::{
+    fs,
+    io::Write,
+    path::{Path, PathBuf},
+};
+use tauri::Manager;
+#[tauri::command]
+fn greet(name: &str) -> String {
+    format!("Hello, {}! You've been greeted from Rust!", name)
+}
+#[tauri::command]
+fn createProject(name: &str) {}
+
+#[cfg_attr(mobile, tauri::mobile_entry_point)]
+pub fn run() {
+    tauri::Builder::default()
+        .plugin(tauri_plugin_opener::init())
+        .invoke_handler(tauri::generate_handler![greet, createProject])
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
+}

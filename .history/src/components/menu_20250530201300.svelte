@@ -1,0 +1,8 @@
+<div class="menu-cnt">menu</div>
+
+<style>
+  .menu-cnt {
+    grid-column: 1/3;
+    grid-row: 1;
+  }
+</style>
